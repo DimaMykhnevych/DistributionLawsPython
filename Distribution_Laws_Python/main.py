@@ -1,10 +1,11 @@
 import math
 import random
+from horology import Timing
 import numpy as np
-import pandas as pd
 import scipy.stats as stats
 from matplotlib import pyplot as plt
 import seaborn as sns
+from zignor import zignor as zigg
 
 
 def uniform_distribution(a, b):
@@ -45,7 +46,7 @@ def normal_density1():
     plt.show()
 
 
-def normal_density2():
+def normal_density2(plt_title="График плотности нормального распределения"):
     data = stats.norm.rvs(10.0, 2.5, size=500)
     mu, std = stats.norm.fit(data)
     plt.hist(data, bins=25, density=True, alpha=0.6, color='g')
@@ -53,7 +54,7 @@ def normal_density2():
     x = np.linspace(xmin, xmax, 100)
     p = stats.norm.pdf(x, mu, std)
     plt.plot(x, p, 'k', linewidth=2)
-    plt.title("График плотности нормального распределения")
+    plt.title(plt_title)
     plt.show()
 
 
@@ -74,12 +75,40 @@ def exponential_density():
     plt.show()
 
 
-uniform_distribution(1, 10)
-uniform_density(1, 10)
+def ziggurat():
+    x = zigg(50000)
+    return x
 
-normal_distribution()
-normal_density1()
-normal_density2()
 
-exponential_distribution()
-exponential_density()
+def muller():
+    x = np.linspace(-5, 5, 50000)
+    return [x, (1/(np.sqrt(2*np.pi)))*(np.power(np.e, -(np.power(x, 2)/2)))]
+
+
+def main():
+    uniform_distribution(1, 10)
+    uniform_density(1, 10)
+
+    normal_distribution()
+    normal_density1()
+    normal_density2()
+
+    exponential_distribution()
+    exponential_density()
+
+    with Timing(name='Ziggurat Algorithm: '):
+        values = ziggurat()
+    sns.distplot(values)
+    plt.title("Ziggurat")
+    plt.show()
+    with Timing(name='Muller Algorithm: '):
+        x, y = muller()
+    sns.distplot(ziggurat(), color='red')
+    plt.title("Muller")
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
+
+
